@@ -2,6 +2,9 @@
 using Messager.Data;
 using System.Text;
 using System.Security.Cryptography;
+using Messager.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Messager.Controllers
 {
@@ -14,7 +17,7 @@ namespace Messager.Controllers
             _context = context;
         }
 
-        public IActionResult Register() 
+        public IActionResult Register()
         {
             return View();
         }
@@ -23,9 +26,9 @@ namespace Messager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(User model)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
-                // Password Hashing
+// Хеширование пароля
                 model.Password = HashPassword(model.Password);
 
                 _context.Users.Add(model);
@@ -37,13 +40,44 @@ namespace Messager.Controllers
             return View(model);
         }
 
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == model.Username);
+
+                if (user != null && VerifyPassword(model.Password, user.Password))
+                {
+// Успешный вход
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError("", "Неверный логин или пароль");
+            }
+
+            return View(model);
+        }
+
         private string HashPassword(string password)
         {
+// Используем алгоритм хеширования, например, SHA256
             using (var sha256 = SHA256.Create())
             {
-                var hashedbytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return BitConverter.ToString(hashedbytes).Replace("-", "").ToLower();
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
             }
+        }
+
+        private bool VerifyPassword(string password, string hashedPassword)
+        {
+            return HashPassword(password) == hashedPassword;
         }
     }
 }
