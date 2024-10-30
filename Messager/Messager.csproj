@@ -19,6 +19,11 @@
 
   <ItemGroup>
     <Compile Remove="Views\Account\Login.cshtml.cs" />
+    <Compile Remove="Migrations\AppDbContextModelSnapshot.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

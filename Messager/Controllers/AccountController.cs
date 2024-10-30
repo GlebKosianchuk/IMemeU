@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Messager.Data;
 using System.Text;
 using System.Security.Cryptography;
 using Messager.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -21,21 +24,33 @@ namespace Messager.Controllers
         {
             return View();
         }
-
+        
+        private bool IsUserNameUnique(string userName)
+        {
+            return !_context.Users.Any(u => u.UserName == userName);
+        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
+        
         public async Task<IActionResult> Register(User model)
         {
             if (ModelState.IsValid)
             {
+                if (!IsUserNameUnique(model.UserName))
+                {
+                    ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
+                    return View(model);
+                }
 // Хеширование пароля
                 model.Password = HashPassword(model.Password);
 
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard", "Home");
             }
+            
 
             return View(model);
         }
@@ -55,8 +70,17 @@ namespace Messager.Controllers
 
                 if (user != null && VerifyPassword(model.Password, user.Password))
                 {
-// Успешный вход
-                    return RedirectToAction("Index", "Home");
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, user.UserName),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                        new ClaimsPrincipal(claimsIdentity));
+                    
+                    return RedirectToAction("Dashboard", "Home");
                 }
 
                 ModelState.AddModelError("", "Неверный логин или пароль");
@@ -64,6 +88,14 @@ namespace Messager.Controllers
 
             return View(model);
         }
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+        
+        
 
         private string HashPassword(string password)
         {

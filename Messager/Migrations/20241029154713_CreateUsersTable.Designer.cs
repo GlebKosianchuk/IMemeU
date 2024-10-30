@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Messager.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241014122022_CreateUsersTable")]
+    [Migration("20241029154713_CreateUsersTable")]
     partial class CreateUsersTable
     {
         /// <inheritdoc />
@@ -19,7 +19,7 @@ namespace Messager.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -32,10 +32,6 @@ namespace Messager.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -47,6 +43,9 @@ namespace Messager.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserName")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
