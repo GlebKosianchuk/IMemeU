@@ -47,6 +47,17 @@ namespace Messager.Controllers
 
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
+                
+                // Выполнение аутентификации после успешной регистрации
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, model.UserName),
+                    new Claim(ClaimTypes.NameIdentifier, model.Id.ToString())
+                };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
                 return RedirectToAction("Dashboard", "Home");
             }
