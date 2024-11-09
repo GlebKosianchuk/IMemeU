@@ -3,7 +3,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Messager.Migrations
+namespace IMemeU.Migrations
 {
     /// <inheritdoc />
     public partial class CreateUsersTable : Migration

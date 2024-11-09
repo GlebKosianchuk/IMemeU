@@ -1,9 +1,9 @@
-using Messager.Models;
+using IMemeU.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Messager.Controllers
+namespace IMemeU.Controllers
 {
     public class HomeController : Controller
     {
