@@ -1,4 +1,4 @@
-namespace Messager.Models
+namespace IMemeU.Models
 {
     public class ErrorViewModel
     {

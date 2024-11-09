@@ -1,15 +1,15 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using Messager.Data;
+using IMemeU.Data;
 using System.Text;
 using System.Security.Cryptography;
-using Messager.Models;
+using IMemeU.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace Messager.Controllers
+namespace IMemeU.Controllers
 {
     public class AccountController : Controller
     {

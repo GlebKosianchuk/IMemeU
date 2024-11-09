@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Messager.Models;
+namespace IMemeU.Models;
 
 public class LoginViewModel
 {

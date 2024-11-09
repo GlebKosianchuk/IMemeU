@@ -1,10 +1,10 @@
-﻿using Messager.Models;
+﻿using IMemeU.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace Messager.Data
+namespace IMemeU.Data
 {
     public class AppDbContext : DbContext
     {

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Messager.Views.Home;
+namespace IMemeU.Views.Home;
 
 public class Dashboard : PageModel
 {

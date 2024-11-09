@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Messager.Data
+namespace IMemeU.Data
 {
     public class User
     {
