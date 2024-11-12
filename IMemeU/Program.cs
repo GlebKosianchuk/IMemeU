@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Добавляем сервисы в контейнер.
+//Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -28,7 +28,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Настройка контейнера HTTP-запроса
+// Setting up an HTTP request container
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
