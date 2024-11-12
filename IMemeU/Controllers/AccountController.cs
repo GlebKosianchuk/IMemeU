@@ -30,6 +30,19 @@ namespace IMemeU.Controllers
             return !_context.Users.Any(u => u.UserName == userName);
         }
         
+        private async Task AuthenticateUser(string userName, string userId)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, userName),
+                new Claim(ClaimTypes.NameIdentifier, userId)
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         
@@ -42,30 +55,19 @@ namespace IMemeU.Controllers
                     ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
                     return View(model);
                 }
-// Хеширование пароля
+// Password Hashing
                 model.Password = HashPassword(model.Password);
 
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
                 
-                // Выполнение аутентификации после успешной регистрации
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, model.Id.ToString())
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
+                await AuthenticateUser(model.UserName, model.Id.ToString());
+                
                 return RedirectToAction("Dashboard", "Home");
             }
-            
-
             return View(model);
         }
-
+        
         public IActionResult Login()
         {
             return View();
@@ -81,25 +83,16 @@ namespace IMemeU.Controllers
 
                 if (user != null && VerifyPassword(model.Password, user.Password))
                 {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity));
+                    await AuthenticateUser(user.UserName, user.Id.ToString());
                     
                     return RedirectToAction("Dashboard", "Home");
-                }
-
+                } 
                 ModelState.AddModelError("", "Неверный логин или пароль");
             }
 
             return View(model);
         }
-
+        
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -110,7 +103,7 @@ namespace IMemeU.Controllers
 
         private string HashPassword(string password)
         {
-// Используем алгоритм хеширования, например, SHA256
+// We use a hashing algorithm SHA256
             using (var sha256 = SHA256.Create())
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
