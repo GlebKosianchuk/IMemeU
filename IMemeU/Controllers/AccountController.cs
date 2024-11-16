@@ -30,7 +30,7 @@ namespace IMemeU.Controllers
             return !_context.Users.Any(u => u.UserName == userName);
         }
         
-        private async Task AuthenticateUser(string userName, string userId)
+        private async Task SignInAsync(string userName, string userId)
         {
             var claims = new List<Claim>
             {
@@ -61,7 +61,7 @@ namespace IMemeU.Controllers
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
                 
-                await AuthenticateUser(model.UserName, model.Id.ToString());
+                await SignInAsync(model.UserName, model.Id.ToString());
                 
                 return RedirectToAction("Dashboard", "Home");
             }
@@ -83,7 +83,7 @@ namespace IMemeU.Controllers
 
                 if (user != null && VerifyPassword(model.Password, user.Password))
                 {
-                    await AuthenticateUser(user.UserName, user.Id.ToString());
+                    await SignInAsync(user.UserName, user.Id.ToString());
                     
                     return RedirectToAction("Dashboard", "Home");
                 } 
