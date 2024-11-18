@@ -30,12 +30,12 @@ namespace IMemeU.Controllers
             return !_context.Users.Any(u => u.UserName == userName);
         }
         
-        private async Task SignInAsync(string userName, string userId)
+        private async Task SignInAsync(string userName, int userId)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.NameIdentifier, userId)
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -61,7 +61,7 @@ namespace IMemeU.Controllers
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
                 
-                await SignInAsync(model.UserName, model.Id.ToString());
+                await SignInAsync(model.UserName, model.Id);
                 
                 return RedirectToAction("Dashboard", "Home");
             }
@@ -83,7 +83,7 @@ namespace IMemeU.Controllers
 
                 if (user != null && VerifyPassword(model.Password, user.Password))
                 {
-                    await SignInAsync(user.UserName, user.Id.ToString());
+                    await SignInAsync(user.UserName, user.Id);
                     
                     return RedirectToAction("Dashboard", "Home");
                 } 
