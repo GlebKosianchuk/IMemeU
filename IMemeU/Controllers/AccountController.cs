@@ -32,7 +32,7 @@ namespace IMemeU.Controllers
         
         private async Task SignInAsync(string userName, int userId)
         {
-            var claims = new List<Claim>
+            var claims = new Claim[]
             {
                 new Claim(ClaimTypes.Name, userName),
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString())
