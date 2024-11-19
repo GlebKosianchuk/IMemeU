@@ -55,7 +55,7 @@ namespace IMemeU.Controllers
                     ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
                     return View(model);
                 }
-// Password Hashing
+// Хеширование пароля
                 model.Password = HashPassword(model.Password);
 
                 _context.Users.Add(model);
@@ -92,7 +92,6 @@ namespace IMemeU.Controllers
 
             return View(model);
         }
-        
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -103,7 +102,7 @@ namespace IMemeU.Controllers
 
         private string HashPassword(string password)
         {
-// We use a hashing algorithm SHA256
+// Используем алгоритм хеширования, например, SHA256
             using (var sha256 = SHA256.Create())
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
