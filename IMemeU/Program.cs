@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//Добавляем сервисы в контейнер.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -18,17 +17,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddAuthentication();
 
-// Add configuration
 var configuration = builder.Configuration;
 
-// Setting up services
 builder.Services.AddDbContext<AppDbContext>(options =>options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Настройка контейнера HTTP-запроса
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

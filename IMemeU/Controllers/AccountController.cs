@@ -55,7 +55,6 @@ namespace IMemeU.Controllers
                     ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
                     return View(model);
                 }
-// Хеширование пароля
                 model.Password = HashPassword(model.Password);
 
                 _context.Users.Add(model);
@@ -101,7 +100,6 @@ namespace IMemeU.Controllers
 
         private string HashPassword(string password)
         {
-// Используем алгоритм хеширования, например, SHA256
             using (var sha256 = SHA256.Create())
             {
                 var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
