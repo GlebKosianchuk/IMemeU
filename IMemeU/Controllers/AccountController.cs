@@ -30,6 +30,19 @@ namespace IMemeU.Controllers
             return !_context.Users.Any(u => u.UserName == userName);
         }
         
+        private async Task SignInAsync(string userName, int userId)
+        {
+            var claims = new Claim[]
+            {
+                new Claim(ClaimTypes.Name, userName),
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        }
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         
@@ -48,24 +61,12 @@ namespace IMemeU.Controllers
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
                 
-                // Выполнение аутентификации после успешной регистрации
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, model.UserName),
-                    new Claim(ClaimTypes.NameIdentifier, model.Id.ToString())
-                };
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
+                await SignInAsync(model.UserName, model.Id);
+                
                 return RedirectToAction("Dashboard", "Home");
             }
-            
-
             return View(model);
         }
-
         public IActionResult Login()
         {
             return View();
@@ -81,25 +82,15 @@ namespace IMemeU.Controllers
 
                 if (user != null && VerifyPassword(model.Password, user.Password))
                 {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity));
+                    await SignInAsync(user.UserName, user.Id);
                     
                     return RedirectToAction("Dashboard", "Home");
-                }
-
+                } 
                 ModelState.AddModelError("", "Неверный логин или пароль");
             }
 
             return View(model);
         }
-
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
