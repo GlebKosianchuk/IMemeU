@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace IMemeU.Controllers;
+namespace IMemeU.Models;
 
-public record UserViewModel
+public record RegistrationViewModel
 {
     [Required]
     [StringLength(50, MinimumLength = 3)]
