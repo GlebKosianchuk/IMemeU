@@ -21,7 +21,7 @@ namespace Messager.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("IMemeU.Data.User", b =>
+            modelBuilder.Entity("Messager.Data.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
