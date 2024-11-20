@@ -4,18 +4,12 @@ using IMemeU.Data;
 
 namespace IMemeU.Models;
 
-public record RegisterViewModel
-{
-    [Required]
-    [StringLength(50, MinimumLength = 3)]
-    public string UserName { get; init; }
-    
-    [Required]
-    [StringLength(50, MinimumLength = 6)]
-    public string Password { get; init; }
-    public RegisterViewModel(string userName, string password)
-    {
-        UserName = userName;
-        Password = password;
-    }
-}
+public record RegisterViewModel(
+    [property: Required]
+    [property: StringLength(50, MinimumLength = 3)]
+    string UserName,
+
+    [property: Required]
+    [property: StringLength(50, MinimumLength = 6)]
+    string Password
+);
