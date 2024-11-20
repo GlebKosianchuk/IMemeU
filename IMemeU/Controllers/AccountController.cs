@@ -45,7 +45,7 @@ namespace IMemeU.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(UserViewModel model)
+        public async Task<IActionResult> Register(RegistrationViewModel model)
         {
             if (ModelState.IsValid)
             {
