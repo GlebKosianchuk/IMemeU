@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace IMemeU.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger) : Controller
+    public class HomeController: Controller
     {
-        private readonly ILogger<HomeController> _logger = logger;
 
         public IActionResult Index()
         {

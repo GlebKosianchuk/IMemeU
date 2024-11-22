@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace IMemeU.Controllers
 {
     public class AccountController(AppDbContext context) : Controller
+
     {
         public IActionResult Register()
         {
@@ -68,6 +69,7 @@ namespace IMemeU.Controllers
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
+            
             var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == model.Username);
 
             if (user != null && VerifyPassword(model.Password, user.Password))
@@ -75,18 +77,16 @@ namespace IMemeU.Controllers
                 await SignInAsync(user.UserName, user.Id);
                     
                 return RedirectToAction("Dashboard", "Home");
-            } 
+            }
             ModelState.AddModelError("", "Неверный логин или пароль");
 
             return View(model);
-        }   
+        }
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
         }
-        
-        
 
         private static string HashPassword(string password)
         {
