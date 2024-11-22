@@ -7,19 +7,11 @@ using IMemeU.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace IMemeU.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController(AppDbContext context) : Controller
     {
-        private readonly AppDbContext _context;
-
-        public AccountController(AppDbContext context)
-        {
-            _context = context;
-        }
-
         public IActionResult Register()
         {
             return View();
@@ -27,15 +19,15 @@ namespace IMemeU.Controllers
         
         private bool IsUserNameUnique(string userName)
         {
-            return !_context.Users.Any(u => u.UserName == userName);
+            return !context.Users.Any(u => u.UserName == userName);
         }
         
         private async Task SignInAsync(string userName, int userId)
         {
             var claims = new Claim[]
             {
-                new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+                new (ClaimTypes.Name, userName),
+                new (ClaimTypes.NameIdentifier, userId.ToString())
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -57,8 +49,8 @@ namespace IMemeU.Controllers
                 }
                 model.Password = HashPassword(model.Password);
 
-                _context.Users.Add(model);
-                await _context.SaveChangesAsync();
+                context.Users.Add(model);
+                await context.SaveChangesAsync();
                 
                 await SignInAsync(model.UserName, model.Id);
                 
@@ -75,21 +67,19 @@ namespace IMemeU.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == model.Username);
+            if (!ModelState.IsValid) return View(model);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == model.Username);
 
-                if (user != null && VerifyPassword(model.Password, user.Password))
-                {
-                    await SignInAsync(user.UserName, user.Id);
+            if (user != null && VerifyPassword(model.Password, user.Password))
+            {
+                await SignInAsync(user.UserName, user.Id);
                     
-                    return RedirectToAction("Dashboard", "Home");
-                } 
-                ModelState.AddModelError("", "Неверный логин или пароль");
-            }
+                return RedirectToAction("Dashboard", "Home");
+            } 
+            ModelState.AddModelError("", "Неверный логин или пароль");
 
             return View(model);
-        }
+        }   
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -98,16 +88,13 @@ namespace IMemeU.Controllers
         
         
 
-        private string HashPassword(string password)
+        private static string HashPassword(string password)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-            }
+            var hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+            return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
         }
 
-        private bool VerifyPassword(string password, string hashedPassword)
+        private static bool VerifyPassword(string password, string hashedPassword)
         {
             return HashPassword(password) == hashedPassword;
         }

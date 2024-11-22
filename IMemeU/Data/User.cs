@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace IMemeU.Data
 {
     public class User
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
         
         [Required]
         [StringLength(50, MinimumLength = 5)]
-        public string UserName { get; set; }
+        public string UserName { get; init; }
 
         [Required]
         [StringLength(100, MinimumLength = 8)]
