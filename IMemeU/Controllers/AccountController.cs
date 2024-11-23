@@ -35,7 +35,7 @@ namespace IMemeU.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(User model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -44,13 +44,18 @@ namespace IMemeU.Controllers
                     ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
                     return View(model);
                 }
-                model.Password = HashPassword(model.Password);
 
-                context.Users.Add(model);
-                await context.SaveChangesAsync();
-                
-                await SignInAsync(model.UserName, model.Id);
-                
+                var dbUser = new User
+                {
+                    UserName = model.UserName,
+                    Password = HashPassword(model.Password),
+                };
+
+                _context.Users.Add(dbUser);
+                await _context.SaveChangesAsync();
+
+                await SignInAsync(dbUser.UserName, dbUser.Id);
+
                 return RedirectToAction("Dashboard", "Home");
             }
             return View(model);
