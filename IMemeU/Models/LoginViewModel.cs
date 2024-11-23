@@ -6,9 +6,9 @@ public class LoginViewModel
 {
     [Required]
     [StringLength(50, MinimumLength = 3)]
-    public string Username { get; set; }
+    public string Username { get; init; }
     
     [Required]
     [StringLength(50, MinimumLength = 8)]
-    public string Password { get; set; }
+    public string Password { get; init; }
 }

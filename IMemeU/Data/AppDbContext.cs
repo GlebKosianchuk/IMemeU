@@ -1,20 +1,10 @@
-﻿using IMemeU.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace IMemeU.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) 
-            : base(options) 
-        {
-
-        }
-
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; init; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
