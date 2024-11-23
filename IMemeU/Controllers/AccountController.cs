@@ -10,93 +10,93 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IMemeU.Controllers;
 
-    public class AccountController(AppDbContext context) : Controller
+public class AccountController(AppDbContext context) : Controller
+{
+    public IActionResult Register()
     {
-        public IActionResult Register()
-        {
-            return View();
-        }
-        private bool IsUserNameUnique(string userName)
-        {
-            return !context.Users.Any(u => u.UserName == userName);
-        }
+        return View();
+    }
+    private bool IsUserNameUnique(string userName)
+    {
+        return !context.Users.Any(u => u.UserName == userName);
+    }
         
-        private async Task SignInAsync(string userName, int userId)
+    private async Task SignInAsync(string userName, int userId)
+    {
+        var claims = new Claim[]
         {
-            var claims = new Claim[]
+            new (ClaimTypes.Name, userName),
+            new (ClaimTypes.NameIdentifier, userId.ToString())
+        };
+
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (ModelState.IsValid)
+        {
+            if (!IsUserNameUnique(model.UserName))
             {
-                new (ClaimTypes.Name, userName),
-                new (ClaimTypes.NameIdentifier, userId.ToString())
+                ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
+                return View(model);
+            }
+
+            var dbUser = new User
+            {
+                UserName = model.UserName,
+                Password = HashPassword(model.Password),
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            context.Users.Add(dbUser);
+            await context.SaveChangesAsync();
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+            await SignInAsync(dbUser.UserName, dbUser.Id);
+
+            return RedirectToAction("Dashboard", "Home");
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                if (!IsUserNameUnique(model.UserName))
-                {
-                    ModelState.AddModelError("UserName", "Данное имя пользователя уже существует");
-                    return View(model);
-                }
-
-                var dbUser = new User
-                {
-                    UserName = model.UserName,
-                    Password = HashPassword(model.Password),
-                };
-
-                context.Users.Add(dbUser);
-                await context.SaveChangesAsync();
-
-                await SignInAsync(dbUser.UserName, dbUser.Id);
-
-                return RedirectToAction("Dashboard", "Home");
-            }
-            return View(model);
-        }
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (!ModelState.IsValid) return View(model);
-            
-            var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == model.Username);
-
-            if (user != null && VerifyPassword(model.Password, user.Password))
-            {
-                await SignInAsync(user.UserName, user.Id);
-                    
-                return RedirectToAction("Dashboard", "Home");
-            }
-            ModelState.AddModelError("", "Неверный логин или пароль");
-
-            return View(model);
-        }
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Index", "Home");
-        }
-
-        private static string HashPassword(string password)
-        {
-            var hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
-            return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-        }
-
-        private static bool VerifyPassword(string password, string hashedPassword)
-        {
-            return HashPassword(password) == hashedPassword;
-        }
+        return View(model);
     }
+    public IActionResult Login()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login(LoginViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+            
+        var user = await context.Users.FirstOrDefaultAsync(u => u.UserName == model.Username);
+
+        if (user != null && VerifyPassword(model.Password, user.Password))
+        {
+            await SignInAsync(user.UserName, user.Id);
+                    
+            return RedirectToAction("Dashboard", "Home");
+        }
+        ModelState.AddModelError("", "Неверный логин или пароль");
+
+        return View(model);
+    }
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToAction("Index", "Home");
+    }
+
+    private static string HashPassword(string password)
+    {
+        var hashedBytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
+        return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+    }
+
+    private static bool VerifyPassword(string password, string hashedPassword)
+    {
+        return HashPassword(password) == hashedPassword;
+    }
+}
