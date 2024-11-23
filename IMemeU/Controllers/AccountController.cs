@@ -11,13 +11,11 @@ using Microsoft.EntityFrameworkCore;
 namespace IMemeU.Controllers
 {
     public class AccountController(AppDbContext context) : Controller
-
     {
         public IActionResult Register()
         {
             return View();
         }
-        
         private bool IsUserNameUnique(string userName)
         {
             return !context.Users.Any(u => u.UserName == userName);
@@ -35,10 +33,8 @@ namespace IMemeU.Controllers
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
         }
-        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
         public async Task<IActionResult> Register(User model)
         {
             if (ModelState.IsValid)
