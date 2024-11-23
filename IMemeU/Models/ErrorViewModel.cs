@@ -1,9 +1,8 @@
-namespace IMemeU.Models
-{
-    public class ErrorViewModel
-    {
-        public string? RequestId { get; init; }
+namespace IMemeU.Models;
 
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-    }
+public class ErrorViewModel
+{
+    public string? RequestId { get; init; }
+
+    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 }
