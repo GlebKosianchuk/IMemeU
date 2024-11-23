@@ -51,8 +51,8 @@ namespace IMemeU.Controllers
                     Password = HashPassword(model.Password),
                 };
 
-                _context.Users.Add(dbUser);
-                await _context.SaveChangesAsync();
+                context.Users.Add(dbUser);
+                await context.SaveChangesAsync();
 
                 await SignInAsync(dbUser.UserName, dbUser.Id);
 
