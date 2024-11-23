@@ -3,8 +3,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IMemeU.Migrations
-{
+namespace IMemeU.Migrations;
+
     /// <inheritdoc />
     public partial class CreateUsersTable : Migration
     {
@@ -39,4 +39,3 @@ namespace IMemeU.Migrations
                 name: "Users");
         }
     }
-}

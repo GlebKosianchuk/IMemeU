@@ -7,8 +7,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IMemeU.Migrations
-{
+namespace IMemeU.Migrations;
+
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
     {
@@ -49,4 +49,3 @@ namespace IMemeU.Migrations
 #pragma warning restore 612, 618
         }
     }
-}

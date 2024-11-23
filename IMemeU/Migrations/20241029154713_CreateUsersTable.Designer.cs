@@ -8,8 +8,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace IMemeU.Migrations
-{
+namespace IMemeU.Migrations;
+
     [DbContext(typeof(AppDbContext))]
     [Migration("20241029154713_CreateUsersTable")]
     partial class CreateUsersTable
@@ -52,4 +52,3 @@ namespace IMemeU.Migrations
 #pragma warning restore 612, 618
         }
     }
-}

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IMemeU.Data
-{
+namespace IMemeU.Data;
+
     public class User
     {
         public int Id { get; init; }
@@ -14,4 +14,3 @@ namespace IMemeU.Data
         [StringLength(100, MinimumLength = 8)]
         public string Password { get; set; }
     }
-}

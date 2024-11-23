@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 
-namespace IMemeU.Controllers
-{
-    public class HomeController: Controller
+namespace IMemeU.Controllers;
+
+    public class HomeController : Controller
     {
         public IActionResult Index()
         {
@@ -24,4 +24,3 @@ namespace IMemeU.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
-}

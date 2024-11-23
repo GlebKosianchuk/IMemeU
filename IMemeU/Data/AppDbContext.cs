@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace IMemeU.Data
-{
+namespace IMemeU.Data;
+
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
         public DbSet<User> Users { get; init; }
@@ -13,4 +13,3 @@ namespace IMemeU.Data
                 .IsUnique();
         }
     }
-}

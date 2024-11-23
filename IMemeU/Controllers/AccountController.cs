@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
-namespace IMemeU.Controllers
-{
+namespace IMemeU.Controllers;
+
     public class AccountController(AppDbContext context) : Controller
     {
         public IActionResult Register()
@@ -100,4 +100,3 @@ namespace IMemeU.Controllers
             return HashPassword(password) == hashedPassword;
         }
     }
-}
