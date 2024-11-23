@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace IMemeU.Controllers
+
 {
     public class AccountController(AppDbContext context) : Controller
     {
@@ -16,11 +17,8 @@ namespace IMemeU.Controllers
         {
             return View();
         }
-        private bool IsUserNameUnique(string userName)
-        {
-            return !context.Users.Any(u => u.UserName == userName);
-        }
-        
+        private bool IsUserNameUnique(string userName) => !context.Users.Any(u => u.UserName == userName);
+
         private async Task SignInAsync(string userName, int userId)
         {
             var claims = new Claim[]
