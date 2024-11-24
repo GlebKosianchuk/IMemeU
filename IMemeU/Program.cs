@@ -1,3 +1,4 @@
+using IMemeU.Controllers;
 using IMemeU.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;

@@ -1,11 +1,12 @@
 using IMemeU.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using IMemeU.Data;
 using Microsoft.AspNetCore.Authorization;
 
 namespace IMemeU.Controllers;
 
-public class HomeController : Controller
+public class HomeController(AppDbContext context) : Controller
 {
     public IActionResult Index()
     {
@@ -15,6 +16,13 @@ public class HomeController : Controller
     [Authorize]
     public IActionResult Dashboard()
     {
+        return View();
+    }
+    [Authorize]
+    public IActionResult Chat()
+    {
+        var messages = context.Messages.OrderByDescending(m => m.Timestamp).ToList();
+        ViewBag.Messages = messages;
         return View();
     }
 

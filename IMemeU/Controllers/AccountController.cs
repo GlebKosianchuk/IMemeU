@@ -33,6 +33,7 @@ public class AccountController(AppDbContext context) : Controller
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
     }
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
@@ -56,9 +57,39 @@ public class AccountController(AppDbContext context) : Controller
 
             await SignInAsync(dbUser.UserName, dbUser.Id);
 
-            return RedirectToAction("Dashboard", "Home");
+            return RedirectToAction("Chat", "Home");
         }
         return View(model);
+    }
+
+    public class MessageController : Controller
+    {
+        private readonly AppDbContext _context;
+
+        public MessageController(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PostMessage([FromBody] string Text)
+        {
+            if (string.IsNullOrEmpty(Text))
+            {
+                return BadRequest("Message text is required.");
+            }
+            var msg = new MessageViewModel()
+            {
+                UserName = User.Identity.Name,
+                Text = Text,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.Messages.Add(msg);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
     public IActionResult Login()
     {
@@ -77,7 +108,7 @@ public class AccountController(AppDbContext context) : Controller
         {
             await SignInAsync(user.UserName, user.Id);
                     
-            return RedirectToAction("Dashboard", "Home");
+            return RedirectToAction("Chat", "Home");
         }
         ModelState.AddModelError("", "Неверный логин или пароль");
 
