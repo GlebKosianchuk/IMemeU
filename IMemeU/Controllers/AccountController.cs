@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using IMemeU.Data;
 using System.Text;
@@ -20,20 +22,26 @@ public class AccountController(AppDbContext context) : Controller
     {
         return !context.Users.Any(u => u.UserName == userName);
     }
-        
+
     private async Task SignInAsync(string userName, int userId)
     {
         var claims = new Claim[]
         {
-            new (ClaimTypes.Name, userName),
-            new (ClaimTypes.NameIdentifier, userId.ToString())
+            new(ClaimTypes.Name, userName),
+            new(ClaimTypes.NameIdentifier, userId.ToString())
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity));
     }
-    
+
+    public class NewMessage
+    {
+        [Required(ErrorMessage = "Message text is required.")]
+        public string Text { get; set; }
+    }
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
@@ -70,25 +78,31 @@ public class AccountController(AppDbContext context) : Controller
         {
             _context = context;
         }
-
+        
         [HttpPost]
-        public async Task<IActionResult> PostMessage([FromBody] string Text)
+        public async Task<IActionResult> PostMessage(NewMessage model)
         {
-            if (string.IsNullOrEmpty(Text))
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(model.Text))
             {
                 return BadRequest("Message text is required.");
             }
-            var msg = new MessageViewModel()
+
+            var msg = new Message()
             {
                 UserName = User.Identity.Name,
-                Text = Text,
+                Text = model.Text,
                 Timestamp = DateTime.UtcNow
             };
 
             _context.Messages.Add(msg);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return RedirectToAction("Chat", "Home");
         }
     }
     public IActionResult Login()

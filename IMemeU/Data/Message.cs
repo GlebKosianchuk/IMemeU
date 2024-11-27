@@ -1,9 +1,9 @@
-namespace IMemeU.Models;
+namespace IMemeU.Data;
 
-public class MessageViewModel
+public class Message
 {
     public int Id { get; init; }
     public string UserName { get; init; }
     public string Text { get; init; }
-    public DateTime Timestamp { get; init; }
+    public DateTimeOffset Timestamp { get; init; }
 }

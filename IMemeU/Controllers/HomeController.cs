@@ -18,12 +18,17 @@ public class HomeController(AppDbContext context) : Controller
     {
         return View();
     }
+    
+    
     [Authorize]
     public IActionResult Chat()
     {
         var messages = context.Messages.OrderByDescending(m => m.Timestamp).ToList();
-        ViewBag.Messages = messages;
-        return View();
+        var viewModel = new ChatViewModel
+        {
+            Messages = messages,
+        };
+        return View(viewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

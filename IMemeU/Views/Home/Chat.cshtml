@@ -1,17 +1,17 @@
-@{
-    ViewData["Title"] = "Chat";
-}
+@model IMemeU.Models.ChatViewModel
 
-<div class="container">
-    <h2 class="text-center">Chat</h2>>
-    <div id="messages" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px;">
-        @foreach (var message in ViewBag.Messages)
-        {
-            <div>@message.UserName: @message.Text</div>
-        }
-    </div>
-    <form method="post" action="/Message/PostMessage">
-        <input type="text" name="Text" class="form-control" placeholder="Type your message..." />
-        <button type="submit" class="btn btn-primary mt-2">Send</button>
-    </form>
+<h2>Chat</h2>
+
+<div id="chat-window" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
+    @foreach (var message in Model.Messages)
+    {
+        <div>
+            <strong>@message.UserName:</strong> @message.Text - @message.Timestamp
+        </div>
+    }
 </div>
+
+<form method="post" action="/Message" style="margin-top: 10px;">
+    <input type="text" name="Text" placeholder="Enter your message" required style="width: 80%;" />
+    <button type="submit" style="width: 18%;">Send</button>
+</form>
