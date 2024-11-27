@@ -1,4 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using IMemeU.Data;
 using System.Text;
@@ -20,18 +22,25 @@ public class AccountController(AppDbContext context) : Controller
     {
         return !context.Users.Any(u => u.UserName == userName);
     }
-        
+
     private async Task SignInAsync(string userName, int userId)
     {
         var claims = new Claim[]
         {
-            new (ClaimTypes.Name, userName),
-            new (ClaimTypes.NameIdentifier, userId.ToString())
+            new(ClaimTypes.Name, userName),
+            new(ClaimTypes.NameIdentifier, userId.ToString())
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity));
+    }
+
+    public class NewMessage
+    {
+        [Required(ErrorMessage = "Message text is required.")]
+        public string Text { get; set; }
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -56,9 +65,45 @@ public class AccountController(AppDbContext context) : Controller
 
             await SignInAsync(dbUser.UserName, dbUser.Id);
 
-            return RedirectToAction("Dashboard", "Home");
+            return RedirectToAction("Chat", "Home");
         }
         return View(model);
+    }
+
+    public class MessageController : Controller
+    {
+        private readonly AppDbContext _context;
+
+        public MessageController(AppDbContext context)
+        {
+            _context = context;
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> PostMessage(NewMessage model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(model.Text))
+            {
+                return BadRequest("Message text is required.");
+            }
+
+            var msg = new Message()
+            {
+                UserName = User.Identity.Name,
+                Text = model.Text,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.Messages.Add(msg);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Chat", "Home");
+        }
     }
     public IActionResult Login()
     {
@@ -77,7 +122,7 @@ public class AccountController(AppDbContext context) : Controller
         {
             await SignInAsync(user.UserName, user.Id);
                     
-            return RedirectToAction("Dashboard", "Home");
+            return RedirectToAction("Chat", "Home");
         }
         ModelState.AddModelError("", "Неверный логин или пароль");
 
