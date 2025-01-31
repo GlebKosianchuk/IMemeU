@@ -1,0 +1,52 @@
+﻿@model List<IMemeU.Data.User>
+
+@{
+var selectedUserId = ViewBag.SelectedUserId as int?;
+var messages = ViewBag.Messages as List<IMemeU.Data.Message>;
+}
+
+<h2>Chat</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <h3>Users</h3>
+        <ul>
+            @foreach (var user in Model)
+            {
+            <li>
+                <a href="@Url.Action("Chat", new { selectedUserId = user.Id })">@user.UserName</a>
+            </li>
+            }
+        </ul>
+    </div>
+
+    <div class="col-md-8">
+        @if (selectedUserId.HasValue)
+        {
+        <h3>Messages with @Model.FirstOrDefault(u => u.Id == selectedUserId)?.UserName</h3>
+        <div id="messages">
+            @if (messages != null)
+            {
+                foreach (var message in messages)
+                {
+                    <div>
+                        <strong>@message.Sender.UserName:</strong> @message.Content <em>(@message.SentAt.ToString("g"))</em>
+                    </div>
+                }
+            }
+        </div>
+
+        <form method="post" action="@Url.Action("SendMessage")">
+            <input type="hidden" name="receiverId" value="@selectedUserId" />
+            <div class="form-group">
+                <textarea name="content" class="form-control" placeholder="Type your message here"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+        }
+        else
+        {
+        <p>Please select a user to start chatting.</p>
+        }
+    </div>
+</div>
